@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Cargar Archivos Excel - Academia de Certificaciones{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Carga de Datos Académicos</h1>
+    <p class="page-description">
+      Seleccione y suba los archivos de estudiantes y evaluaciones para procesar las reglas de certificación.
+    </p>
+  </div>
+  <div>
+    <a href="/" class="btn btn-outline">
+      <span>⬅️</span> Volver al Tablero
+    </a>
+  </div>
+</div>
+
+<div class="upload-card">
+  <form action="/cargar" method="POST" enctype="multipart/form-data">
+    
+    <!-- Archivo 1: Maestro de Estudiantes -->
+    <div class="form-group">
+      <label for="archivo_maestro" class="form-label">
+        📄 1. Archivo Maestro de Estudiantes (.xlsx)
+      </label>
+      <input 
+        type="file" 
+        id="archivo_maestro" 
+        name="archivo_maestro" 
+        class="form-file-input" 
+        accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+        required
+      >
+      <div class="form-help">
+        Debe contener la hoja <code>Estudiantes</code> con las columnas: <em>Identificacion, Nombre_Completo, Correo, Programa, Cohorte</em>.
+      </div>
+    </div>
+
+    <!-- Archivo 2: Registro de Evaluaciones -->
+    <div class="form-group">
+      <label for="archivo_evaluaciones" class="form-label">
+        📄 2. Archivo Registro de Evaluaciones (.xlsx)
+      </label>
+      <input 
+        type="file" 
+        id="archivo_evaluaciones" 
+        name="archivo_evaluaciones" 
+        class="form-file-input" 
+        accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+        required
+      >
+      <div class="form-help">
+        Debe contener la hoja <code>Evaluaciones</code> con las columnas: <em>Identificacion, Programa, Modulo, Nota, Asistencia_Pct, Fecha_Cierre</em>.
+      </div>
+    </div>
+
+    <div style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <a href="/" class="btn btn-outline">Cancelar</a>
+      <button type="submit" class="btn btn-gold" style="font-weight: 700;">
+        <span>🚀</span> Procesar y Guardar Archivos
+      </button>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

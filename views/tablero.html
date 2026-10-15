@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Tablero de Control - Academia de Certificaciones{% endblock %}
+
+{% block content %}
+<!-- Encabezado del Tablero -->
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Tablero General de Certificación</h1>
+    <p class="page-description">
+      Seguimiento y validación académica para emisión formal de certificados.
+    </p>
+  </div>
+  <div>
+    <a href="/descargar-todos" class="btn btn-gold" title="Descargar paquete consolidado de certificados">
+      <span>📦</span> Descargar Todos (.ZIP)
+    </a>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     Tarjetas de Métricas Principales (3 Contadores Destacados)
+     ========================================================================== -->
+<div class="metrics-grid">
+  <!-- Tarjeta: Aprobación -->
+  <div class="metric-card card-aprobacion">
+    <div class="metric-header">
+      <span class="metric-label">Certificados de Aprobación</span>
+      <span class="metric-badge-icon">🎓</span>
+    </div>
+    <div class="metric-value">{{ totales.aprobacion | default(0) }}</div>
+    <div class="metric-footer">
+      Cumplen: Promedio &ge; 70 y Asistencia &ge; 80%
+    </div>
+  </div>
+
+  <!-- Tarjeta: Participación -->
+  <div class="metric-card card-participacion">
+    <div class="metric-header">
+      <span class="metric-label">Certificados de Participación</span>
+      <span class="metric-badge-icon">📜</span>
+    </div>
+    <div class="metric-value">{{ totales.participacion | default(0) }}</div>
+    <div class="metric-footer">
+      Cumplen: Promedio &lt; 70 y Asistencia &ge; 80%
+    </div>
+  </div>
+
+  <!-- Tarjeta: Sin Certificado -->
+  <div class="metric-card card-sin-cert">
+    <div class="metric-header">
+      <span class="metric-label">Sin Derecho a Certificado</span>
+      <span class="metric-badge-icon">⛔</span>
+    </div>
+    <div class="metric-value">{{ totales.sin_certificado | default(0) }}</div>
+    <div class="metric-footer">
+      Criterio: Asistencia &lt; 80%
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     Cuadro / Panel de Inconsistencias
+     ========================================================================== -->
+<div class="inconsistencies-panel {% if (totales.inconsistencias | default(0)) == 0 %}has-none{% endif %}">
+  <div class="inconsistencies-header">
+    <div class="inconsistencies-title-area">
+      <div class="inconsistencies-icon">
+        {% if (totales.inconsistencias | default(0)) > 0 %}⚠️{% else %}✅{% endif %}
+      </div>
+      <div>
+        <h2 class="inconsistencies-title">
+          Panel de Inconsistencias y Alertas Académicas
+        </h2>
+      </div>
+    </div>
+    <div>
+      <span class="inconsistencies-counter">
+        {{ totales.inconsistencias | default(0) }} Caso(s) Detectado(s)
+      </span>
+    </div>
+  </div>
+
+  <p class="inconsistencies-description">
+    Los registros con inconsistencias no se certifican automáticamente. Requieren subsanación o revisión administrativa previa.
+  </p>
+
+  {% if lista_inconsistencias and lista_inconsistencias | length > 0 %}
+    <div class="table-responsive">
+      <table class="inconsistencies-table">
+        <thead>
+          <tr>
+            <th>Identificación</th>
+            <th>Estudiante / Registro</th>
+            <th>Motivo de la Alerta</th>
+            <th>Acción / Recomendación</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inc in lista_inconsistencias %}
+            <tr>
+              <td class="id-col">{{ inc.identificacion | default('N/D') }}</td>
+              <td><strong>{{ inc.nombre or inc.nombre_completo or 'No registrado' }}</strong></td>
+              <td>
+                <span class="badge-alerta">
+                  {{ inc.motivo or inc.descripcion or inc.tipo_inconsistencia or 'Inconsistencia detectada' }}
+                </span>
+              </td>
+              <td>{{ inc.recomendacion or inc.accion or 'Revisar datos en origen' }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="font-size: 0.9rem; color: #15803D; font-weight: 500;">
+      No se registran inconsistencias en el conjunto de datos actual. Todos los registros cumplen con la consistencia requerida.
+    </div>
+  {% endif %}
+</div>
+
+<!-- ==========================================================================
+     Tabla Detallada de Estudiantes
+     ========================================================================== -->
+<div class="card-section">
+  <div class="section-header">
+    <div class="section-title">
+      <span>👥</span> Nómina de Estudiantes y Estado de Certificación
+    </div>
+    <span class="section-badge">
+      Total evaluados: {{ lista_estudiantes | length if lista_estudiantes else 0 }}
+    </span>
+  </div>
+
+  <!-- Filtro por programa (los contadores de arriba no cambian) -->
+  <form method="get" action="/" class="filter-bar">
+    <label for="programa">Filtrar por programa:</label>
+    <select name="programa" id="programa" onchange="this.form.submit()">
+      <option value="">Todos los programas</option>
+      {% for prog in programas %}
+        <option value="{{ prog }}" {% if prog == programa_sel %}selected{% endif %}>{{ prog }}</option>
+      {% endfor %}
+    </select>
+    {% if programa_sel %}
+      <a href="/" class="btn btn-outline" style="padding: 0.25rem 0.65rem; font-size: 0.8rem;">Ver todos</a>
+    {% endif %}
+  </form>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Identificación</th>
+          <th>Estudiante</th>
+          <th>Programa</th>
+          <th style="text-align: right;">Módulos</th>
+          <th style="text-align: right;">Promedio</th>
+          <th style="text-align: right;">Asistencia (%)</th>
+          <th style="text-align: center;">Tipo de Certificado</th>
+          <th style="text-align: center;">Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if lista_estudiantes and lista_estudiantes | length > 0 %}
+          {% for est in lista_estudiantes %}
+            {% set tipo = (est.tipo_certificado or est.estado or est.certificado or 'Pendiente') | string %}
+            {% if 'Aprobación' in tipo or 'Aprobado' in tipo %}
+              {% set fila_clase = 'fila-aprobacion' %}
+            {% elif 'Participación' in tipo %}
+              {% set fila_clase = 'fila-participacion' %}
+            {% elif 'Sin certificado' in tipo %}
+              {% set fila_clase = 'fila-sin-certificado' %}
+            {% else %}
+              {% set fila_clase = '' %}
+            {% endif %}
+            <tr class="{{ fila_clase }}">
+              <td class="cell-id">{{ est.identificacion }}</td>
+              <td class="cell-student">{{ est.nombre or est.nombre_completo or '-' }}</td>
+              <td class="cell-program">{{ est.programa or '-' }}</td>
+              <td class="cell-numeric" style="text-align: right;">
+                {{ est.cantidad_evaluaciones | default(est.modulos | default('-')) }}
+              </td>
+              <td class="cell-numeric" style="text-align: right;">
+                {{ "%.2f"|format(est.promedio or est.promedio_nota|default(0)|float) }}
+              </td>
+              <td class="cell-numeric" style="text-align: right;">
+                {{ "%.2f"|format(est.asistencia or est.asistencia_pct|default(0)|float) }}%
+              </td>
+              <td style="text-align: center;">
+                {% if 'Aprobación' in tipo or 'Aprobado' in tipo %}
+                  <span class="badge badge-aprobacion">🏆 {{ tipo }}</span>
+                {% elif 'Participación' in tipo %}
+                  <span class="badge badge-participacion">📜 {{ tipo }}</span>
+                {% elif 'Sin certificado' in tipo %}
+                  <span class="badge badge-sin-certificado">⛔ {{ tipo }}</span>
+                {% else %}
+                  <span class="badge badge-inconsistencia">⚠️ {{ tipo }}</span>
+                {% endif %}
+              </td>
+              <td style="text-align: center;">
+                {% if 'Aprobación' in tipo or 'Participación' in tipo %}
+                  <a href="/certificado/{{ est.identificacion }}/{{ est.programa | default('General') }}" 
+                     class="btn btn-outline" 
+                     style="padding: 0.25rem 0.65rem; font-size: 0.8rem;" 
+                     title="Ver certificado en PDF"
+                     target="_blank">
+                    📄 PDF
+                  </a>
+                {% else %}
+                  <span style="color: var(--color-text-light); font-size: 0.8rem;">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--color-text-muted);">
+              No hay registros disponibles en este momento. Por favor cargue los archivos Excel correspondientes en <a href="/cargar" style="color: var(--color-accent-gold); font-weight: 600;">Cargar Excel</a>.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

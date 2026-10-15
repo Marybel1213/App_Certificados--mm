@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Academia de Certificaciones{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+
+  <!-- Barra de Navegación Institucional -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand">
+        <div class="brand-icon">🎓</div>
+        <div>
+          <span class="brand-title">Academia Horizonte</span>
+          <span class="brand-subtitle">Sistema de Control y Emisión</span>
+        </div>
+      </a>
+      <nav>
+        <ul class="nav-menu">
+          <li>
+            <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
+              <span>📊</span> Tablero
+            </a>
+          </li>
+          <li>
+            <a href="/cargar" class="nav-link {% if request.path == '/cargar' %}active{% endif %}">
+              <span>📤</span> Cargar Excel
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenedor Principal -->
+  <main class="main-container">
+    {# Bloque para mensajes de alerta / flash de Flask #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-alert {{ category }}">
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <!-- Pie de Página Institucional -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div>
+        <span class="footer-brand">Academia Horizonte</span> &copy; 2026. Todos los derechos reservados.
+      </div>
+      <div>
+        Control de Calidad Académica &bull; Sistema Automatizado de Reglas
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
