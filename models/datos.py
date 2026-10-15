@@ -6,6 +6,7 @@ Soporta Supabase (PostgreSQL) cuando DATABASE_URL está definida y SQLite local
 
 import contextlib
 import os
+import tempfile
 from pathlib import Path
 import sqlite3
 from typing import Any, Dict, List, Optional
@@ -16,8 +17,13 @@ load_dotenv()
 DATABASE_URL: Optional[str] = os.getenv("DATABASE_URL")
 USAR_SQLITE: bool = not DATABASE_URL or not DATABASE_URL.strip()
 
-# Ruta para la base de datos SQLite local
-DB_PATH = Path(__file__).resolve().parent.parent / "certificados.db"
+# Ruta para la base de datos SQLite local.
+# OJO Vercel: allá el disco es de solo lectura excepto /tmp, así que en la
+# nube la base vive en /tmp (se recarga sola desde INSUMOS en cada arranque).
+if os.getenv("VERCEL"):
+    DB_PATH = Path(tempfile.gettempdir()) / "certificados.db"
+else:
+    DB_PATH = Path(__file__).resolve().parent.parent / "certificados.db"
 
 # Import condicional de psycopg para PostgreSQL
 if not USAR_SQLITE:
