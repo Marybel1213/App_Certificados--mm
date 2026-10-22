@@ -175,13 +175,22 @@ def calcular_resumen(
 
 
 def obtener_estudiante_procesado(identificacion: str, programa: str) -> Optional[Dict[str, Any]]:
-    """Busca un estudiante procesado por su identificación y programa."""
+    """Busca un estudiante procesado por su identificación y programa.
+
+    Las comparaciones se hacen SIEMPRE como texto: en algunas bases (por
+    ejemplo PostgreSQL) la identificación puede volver como número, y la URL
+    siempre la entrega como texto. Sin esta conversión, la búsqueda fallaba
+    en el servidor aunque el tablero mostrara los datos.
+    """
     resumen = calcular_resumen()
     ident_limpia = str(identificacion).strip()
     prog_limpio = str(programa).strip()
 
     for est in resumen["lista_estudiantes"]:
-        if est["identificacion"] == ident_limpia and est["programa"] == prog_limpio:
+        # LADRILLO: CONDICIONAL con comparación de texto en ambos lados.
+        est_ident = str(est.get("identificacion", "")).strip()
+        est_prog = str(est.get("programa", "")).strip()
+        if est_ident == ident_limpia and est_prog == prog_limpio:
             return est
 
     return None
