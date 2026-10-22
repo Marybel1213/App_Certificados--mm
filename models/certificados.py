@@ -5,6 +5,7 @@ Implementa estrictamente las reglas R1 a R6 descritas en AGENTS.md.
 
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
+from urllib.parse import unquote
 
 from models.datos import obtener_estudiantes, obtener_evaluaciones
 
@@ -179,12 +180,12 @@ def obtener_estudiante_procesado(identificacion: str, programa: str) -> Optional
 
     Las comparaciones se hacen SIEMPRE como texto: en algunas bases (por
     ejemplo PostgreSQL) la identificación puede volver como número, y la URL
-    siempre la entrega como texto. Sin esta conversión, la búsqueda fallaba
-    en el servidor aunque el tablero mostrara los datos.
+    siempre la entrega como texto. Además, Vercel entrega la ruta todavía
+    codificada (%20, %C3%A9), así que la decodificamos antes de comparar.
     """
     resumen = calcular_resumen()
-    ident_limpia = str(identificacion).strip()
-    prog_limpio = str(programa).strip()
+    ident_limpia = unquote(str(identificacion)).strip()
+    prog_limpio = unquote(str(programa)).strip()
 
     for est in resumen["lista_estudiantes"]:
         # LADRILLO: CONDICIONAL con comparación de texto en ambos lados.

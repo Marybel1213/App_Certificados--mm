@@ -8,7 +8,7 @@ import io
 import unicodedata
 import zipfile
 
-from flask import Blueprint, abort, jsonify, request, send_file
+from flask import Blueprint, abort, send_file
 
 from controllers.auth import requiere_login, solo_admin
 from models.certificados import calcular_resumen, obtener_estudiante_procesado
@@ -54,30 +54,6 @@ def certificado(identificacion: str, programa: str):
         download_name=_nombre_archivo(estudiante),
         as_attachment=False,
     )
-
-
-@certificados_bp.route("/diagnostico/<identificacion>/<path:programa>")
-@solo_admin
-def diagnostico(identificacion: str, programa: str):
-    """RUTA TEMPORAL: muestra qué recibe la función desde Vercel."""
-    resumen = calcular_resumen()
-    return jsonify({
-        "identificacion": repr(identificacion),
-        "programa": repr(programa),
-        "request_path": request.path,
-        "path_info": repr(request.environ.get("PATH_INFO")),
-        "request_uri": repr(request.environ.get("REQUEST_URI")),
-        "total": len(resumen["lista_estudiantes"]),
-        "muestra": [
-            {
-                "ident": repr(e.get("identificacion")),
-                "prog": repr(e.get("programa")),
-                "tipo": repr(e.get("tipo_certificado")),
-            }
-            for e in resumen["lista_estudiantes"][:3]
-        ],
-        "coincide": obtener_estudiante_procesado(identificacion, programa) is not None,
-    })
 
 
 @certificados_bp.route("/descargar-todos")

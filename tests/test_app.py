@@ -158,3 +158,22 @@ def test_excel_modificado_cambia_contadores(cliente):
     assert contadores == ["18", "4", "1"]
     # También debe avisar que son datos subidos y no guardados.
     assert "aviso-verde" in html
+
+
+# ---------------------------------------------------------------------------
+# PRUEBA 5: la búsqueda del PDF tolera la ruta codificada de Vercel.
+# ---------------------------------------------------------------------------
+def test_busqueda_de_certificado_acepta_url_codificada():
+    """Reproduce el fallo de Vercel: la ruta llega como T%C3%A9cnico%20...
+
+    La búsqueda debe decodificar (%20 = espacio, %C3%A9 = é) y encontrar al
+    estudiante, para que el PDF individual no responda 404.
+    """
+    from models.certificados import obtener_estudiante_procesado
+
+    estudiante = obtener_estudiante_procesado(
+        "101230456", "T%C3%A9cnico%20en%20IA%20Aplicada"
+    )
+
+    assert estudiante is not None
+    assert estudiante["tipo_certificado"] == "Aprobación"
