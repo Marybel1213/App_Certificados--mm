@@ -177,3 +177,33 @@ def test_busqueda_de_certificado_acepta_url_codificada():
 
     assert estudiante is not None
     assert estudiante["tipo_certificado"] == "Aprobación"
+
+
+# ---------------------------------------------------------------------------
+# PRUEBA 6: en modo demostración el login muestra ambos usuarios de prueba.
+# ---------------------------------------------------------------------------
+def test_login_en_modo_demo_muestra_credenciales_de_prueba(cliente, monkeypatch):
+    """Sin variables de entorno, la pantalla de entrada debe listar los dos
+    usuarios de prueba (administrador y usuario normal) con sus claves."""
+    # LADRILLO: BUCLE que borra las variables solo durante esta prueba.
+    for variable in (
+        "ADMIN_CORREO",
+        "ADMIN_CLAVE",
+        "USUARIO_CORREO",
+        "USUARIO_CLAVE",
+    ):
+        monkeypatch.delenv(variable, raising=False)
+
+    respuesta = cliente.get("/login")
+    html = respuesta.get_data(as_text=True)
+
+    assert respuesta.status_code == 200
+    assert "Modo demostración" in html
+    # Perfil administrador y su clave.
+    assert "admin@academia.cr" in html
+    assert "admin123" in html
+    # Perfil usuario normal y su clave.
+    assert "usuario@academia.cr" in html
+    assert "usuario123" in html
+    assert "Administrador" in html
+    assert "Usuario normal" in html

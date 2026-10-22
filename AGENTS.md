@@ -33,7 +33,7 @@
 - `services/generador_pdf.py` (fpdf2, A4 horizontal) + `controllers/certificados.py`: `/certificado/<identificacion>/<programa>` (PDF inline) y `/descargar-todos` (ZIP con 22 PDFs). Solo Aprobación y Participación; el resto responde 404.
 
 ## Autenticación (sesiones Flask, sin base de datos)
-- Dos usuarios leídos del entorno: `ADMIN_CORREO`/`ADMIN_CLAVE` (rol `admin`) y `USUARIO_CORREO`/`USUARIO_CLAVE` (rol `usuario`). Si faltan variables, `services/autenticacion.py` usa valores de demostración y `views/login.html` muestra el aviso de modo demostración.
+- Dos usuarios leídos del entorno: `ADMIN_CORREO`/`ADMIN_CLAVE` (rol `admin`) y `USUARIO_CORREO`/`USUARIO_CLAVE` (rol `usuario`). Si faltan variables, `services/autenticacion.py` usa valores de demostración y `views/login.html` muestra el aviso de modo demostración junto con los dos usuarios de prueba y sus claves.
 - `controllers/auth.py` define `requiere_login` y `solo_admin` (decoradoras). Toda ruta nueva que muestre datos DEBE llevar `requiere_login`; las acciones administrativas (hoy `/descargar-todos`), `solo_admin`, que responde 403 con `views/sin_permiso.html`.
 - Sesión: `session["correo"]` y `session["rol"]`; `/salir` hace `session.clear()`. La cookie se firma con `SECRET_KEY` (en producción, variable de entorno de Vercel).
 - Plantillas: la carpeta es `views/` (no `templates/`), porque `app.py` configura `template_folder="views"`.

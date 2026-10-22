@@ -26,7 +26,27 @@
           No se configuraron todas las variables de entorno, así que se están
           usando los usuarios de prueba. Configure <code>ADMIN_CORREO</code>,
           <code>ADMIN_CLAVE</code>, <code>USUARIO_CORREO</code> y
-          <code>USUARIO_CLAVE</code> en su archivo <code>.env</code>.
+          <code>USUARIO_CLAVE</code> en su archivo <code>.env</code> o en las
+          variables de entorno de Vercel.
+
+          {% if usuarios_demo %}
+            <!-- Credenciales de prueba visibles SOLO mientras falten las variables -->
+            <div class="demo-users">
+              <p class="demo-users-title">Usuarios de prueba disponibles:</p>
+              <ul class="demo-users-list">
+                {% for usuario in usuarios_demo %}
+                  <li>
+                    <span class="demo-role">
+                      {{ 'Administrador' if usuario.rol == 'admin' else 'Usuario normal' }}:
+                    </span>
+                    <code>{{ usuario.correo }}</code>
+                    <span class="demo-sep">/</span>
+                    <code>{{ usuario.clave }}</code>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
         </div>
       {% endif %}
 

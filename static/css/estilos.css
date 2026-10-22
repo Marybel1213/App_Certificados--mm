@@ -868,6 +868,37 @@ body {
   color: #92400E;
 }
 
+.demo-users {
+  margin-top: 0.6rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed rgba(146, 64, 14, 0.35);
+}
+
+.demo-users-title {
+  margin: 0 0 0.35rem;
+  font-weight: 700;
+}
+
+.demo-users-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.demo-users-list li {
+  line-height: 1.45;
+}
+
+.demo-role {
+  font-weight: 700;
+  margin-right: 0.2rem;
+}
+
+.demo-sep {
+  margin: 0 0.15rem;
+}
+
 .login-alert-error {
   background: #FEE2E2;
   border: 1px solid #FCA5A5;

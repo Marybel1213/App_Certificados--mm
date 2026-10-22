@@ -91,6 +91,7 @@ def login():
         error=error,
         correo=correo_escrito,
         modo_demo=configuracion["modo_demo"],
+        usuarios_demo=configuracion["usuarios_demo"],
     )
 
 

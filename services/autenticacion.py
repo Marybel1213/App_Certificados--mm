@@ -57,7 +57,32 @@ def obtener_configuracion() -> Dict:
         },
     ]
 
-    return {"usuarios": usuarios, "modo_demo": modo_demo}
+    # LADRILLO: lista con los perfiles que están 100% en demostración (les
+    # faltan SUS dos variables). Solo estos se muestran en la pantalla de
+    # entrada, para no revelar correos reales configurados a medias.
+    usuarios_demo: List[Dict[str, str]] = []
+    if not admin_correo and not admin_clave:
+        usuarios_demo.append(
+            {
+                "rol": "admin",
+                "correo": ADMIN_CORREO_DEMO,
+                "clave": ADMIN_CLAVE_DEMO,
+            }
+        )
+    if not usuario_correo and not usuario_clave:
+        usuarios_demo.append(
+            {
+                "rol": "usuario",
+                "correo": USUARIO_CORREO_DEMO,
+                "clave": USUARIO_CLAVE_DEMO,
+            }
+        )
+
+    return {
+        "usuarios": usuarios,
+        "modo_demo": modo_demo,
+        "usuarios_demo": usuarios_demo,
+    }
 
 
 def verificar_credenciales(correo: str, clave: str) -> Optional[Dict[str, str]]:
