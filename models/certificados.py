@@ -14,8 +14,15 @@ ASISTENCIA_MINIMA: float = 80.0
 ASISTENCIA_INCONSISTENCIA_LIMITE: float = 50.0
 
 
-def calcular_resumen() -> Dict[str, Any]:
+def calcular_resumen(
+    estudiantes_db: Optional[List[Dict[str, Any]]] = None,
+    evaluaciones_db: Optional[List[Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
     """Calcula el resumen completo de certificaciones e inconsistencias.
+
+    Los parámetros son OPCIONALES: si no se pasan, se leen de la base de datos
+    (comportamiento normal de la app). Si se pasan listas, se calcula sobre
+    esos datos, por ejemplo los Excel que un administrador sube en memoria.
     
     Aplica las reglas R1 a R6:
     - R1: Agrupa por identificación + programa.
@@ -31,8 +38,8 @@ def calcular_resumen() -> Dict[str, Any]:
     - lista_estudiantes: lista de diccionarios de estudiantes certificados/clasificados
     - lista_inconsistencias: lista de diccionarios de inconsistencias detectadas
     """
-    estudiantes_db = obtener_estudiantes()
-    evaluaciones_db = obtener_evaluaciones()
+    estudiantes_db = estudiantes_db if estudiantes_db is not None else obtener_estudiantes()
+    evaluaciones_db = evaluaciones_db if evaluaciones_db is not None else obtener_evaluaciones()
 
     # Mapeo del maestro de estudiantes por (identificacion, programa)
     # y conjunto de identificaciones registradas en el maestro

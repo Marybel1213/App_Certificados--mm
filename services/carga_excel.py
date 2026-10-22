@@ -1,5 +1,6 @@
 """Servicio de lectura, validación y carga de archivos Excel hacia la base de datos."""
 
+import io
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
@@ -65,14 +66,45 @@ def limpiar_fecha(valor: Any):
         return None
 
 
-def leer_y_validar_maestro(ruta_archivo: Path | str) -> List[Dict[str, Any]]:
-    """Lee y valida el archivo Excel Maestro_Estudiantes.xlsx."""
-    ruta = Path(ruta_archivo)
+def _preparar_fuente(fuente: Any, nombre_archivo: str):
+    """Devuelve algo que pandas pueda leer: una ruta o un archivo en memoria.
+
+    Si 'fuente' es un archivo abierto (por ejemplo un BytesIO), lo rebobinamos
+    al inicio. Si es una ruta, comprobamos que exista.
+    """
+    # LADRILLO: CONDICIONAL. Los archivos en memoria tienen el método .read().
+    if hasattr(fuente, "read"):
+        fuente.seek(0)
+        return fuente
+
+    ruta = Path(fuente)
     if not ruta.exists():
-        raise FileNotFoundError(f"El archivo maestro no existe: {ruta}")
+        raise FileNotFoundError(f"El archivo {nombre_archivo} no existe: {ruta}")
+    return ruta
+
+
+def leer_desde_memoria(contenido_maestro: bytes, contenido_evaluaciones: bytes):
+    """Lee los dos Excel que llegan como bytes, sin escribir nada en el disco.
+
+    BytesIO es como una caja de cartón vacía: metemos los bytes del archivo
+    dentro y pandas lo lee como si fuera un archivo real, pero ese "archivo"
+    solo existe en la memoria mientras dura la petición.
+    """
+    # LADRILLO: BytesIO envuelve los bytes para simular un archivo abierto.
+    estudiantes = leer_y_validar_maestro(io.BytesIO(contenido_maestro))
+    evaluaciones = leer_y_validar_evaluaciones(io.BytesIO(contenido_evaluaciones))
+    return estudiantes, evaluaciones
+
+
+def leer_y_validar_maestro(fuente: Any) -> List[Dict[str, Any]]:
+    """Lee y valida el archivo Excel Maestro_Estudiantes.xlsx.
+
+    'fuente' puede ser una ruta (INSUMOS) o un archivo en memoria (subida web).
+    """
+    origen = _preparar_fuente(fuente, "maestro de estudiantes")
 
     # Leemos la hoja 'Estudiantes' asegurando Identificacion como string
-    df = pd.read_excel(ruta, sheet_name="Estudiantes", dtype={"Identificacion": str})
+    df = pd.read_excel(origen, sheet_name="Estudiantes", dtype={"Identificacion": str})
 
     # Validar columnas
     columnas_faltantes = [col for col in COLUMNAS_MAESTRO_REQUERIDAS if col not in df.columns]
@@ -96,14 +128,15 @@ def leer_y_validar_maestro(ruta_archivo: Path | str) -> List[Dict[str, Any]]:
     return estudiantes
 
 
-def leer_y_validar_evaluaciones(ruta_archivo: Path | str) -> List[Dict[str, Any]]:
-    """Lee y valida el archivo Excel Registro_Evaluaciones.xlsx."""
-    ruta = Path(ruta_archivo)
-    if not ruta.exists():
-        raise FileNotFoundError(f"El archivo de evaluaciones no existe: {ruta}")
+def leer_y_validar_evaluaciones(fuente: Any) -> List[Dict[str, Any]]:
+    """Lee y valida el archivo Excel Registro_Evaluaciones.xlsx.
+
+    'fuente' puede ser una ruta (INSUMOS) o un archivo en memoria (subida web).
+    """
+    origen = _preparar_fuente(fuente, "registro de evaluaciones")
 
     # Leemos la hoja 'Evaluaciones' asegurando Identificacion como string
-    df = pd.read_excel(ruta, sheet_name="Evaluaciones", dtype={"Identificacion": str})
+    df = pd.read_excel(origen, sheet_name="Evaluaciones", dtype={"Identificacion": str})
 
     # Validar columnas
     columnas_faltantes = [col for col in COLUMNAS_EVALUACIONES_REQUERIDAS if col not in df.columns]

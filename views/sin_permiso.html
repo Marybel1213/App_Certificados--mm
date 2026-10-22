@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Sin permiso - Academia Horizonte{% endblock %}
+
+{% block content %}
+<!-- Página amable para cuando un usuario normal intenta entrar a una zona de admin -->
+<div class="denied-wrapper">
+  <div class="denied-card">
+
+    <div class="denied-icon">🔒</div>
+
+    <h1 class="denied-title">Esta sección es solo para administradores</h1>
+
+    <p class="denied-text">
+      Su sesión no tiene permisos para ver esta parte del sistema. Si necesita
+      acceso, solicite a la coordinación académica que le asigne el rol de
+      administrador.
+    </p>
+
+    <!-- Datos de la sesión actual -->
+    <div class="denied-session">
+      <p>
+        <span class="denied-label">Correo:</span>
+        <strong>{{ session.get('correo') or 'Sin sesión' }}</strong>
+      </p>
+      <p>
+        <span class="denied-label">Rol:</span>
+        <span class="nav-user-role rol-{{ session.get('rol') or 'usuario' }}">
+          {{ session.get('rol') or 'usuario' }}
+        </span>
+      </p>
+    </div>
+
+    <!-- Enlaces de salida -->
+    <div class="denied-actions">
+      <a href="{{ url_for('tablero.index') }}" class="btn btn-gold">
+        ⬅️ Volver al tablero
+      </a>
+      <a href="{{ url_for('auth.salir') }}" class="btn btn-outline">
+        Salir
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

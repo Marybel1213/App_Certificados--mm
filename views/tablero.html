@@ -11,12 +11,91 @@
       Seguimiento y validación académica para emisión formal de certificados.
     </p>
   </div>
+  {% if session.get('rol') == 'admin' %}
   <div>
     <a href="/descargar-todos" class="btn btn-gold" title="Descargar paquete consolidado de certificados">
       <span>📦</span> Descargar Todos (.ZIP)
     </a>
   </div>
+  {% endif %}
 </div>
+
+{% if session.get('rol') == 'admin' %}
+<!-- ==========================================================================
+     PANEL DE ADMINISTRADOR: subir los dos Excel y recalcular
+     ========================================================================== -->
+<div class="admin-panel" id="panel-admin">
+  <div class="section-header">
+    <div class="section-title">
+      <span>🛠️</span> Panel de administrador
+    </div>
+    <span class="section-badge">Solo rol admin</span>
+  </div>
+
+  {% if datos_subidos %}
+    <!-- Aviso verde: estos resultados no se guardan -->
+    <div class="aviso-verde" role="status">
+      <strong>Está viendo resultados calculados con los archivos que subió.</strong>
+      Viven solo en esta pantalla: no se guardaron. Al recargar la app se
+      volverá a los datos de fábrica, porque todavía no hay dónde almacenarlos.
+    </div>
+  {% endif %}
+
+  <!-- Siempre visible: de dónde salen los datos que se están mostrando -->
+  <p class="admin-origin">
+    <strong>Origen de los datos en pantalla:</strong> {{ origen_datos }}
+  </p>
+
+  <form action="{{ url_for('cargar.cargar') }}"
+        method="post"
+        enctype="multipart/form-data"
+        class="upload-form">
+
+    <div class="upload-grid">
+      <div class="form-group">
+        <label for="archivo_maestro" class="form-label">
+          📄 Maestro de estudiantes (.xlsx)
+        </label>
+        <input type="file"
+               id="archivo_maestro"
+               name="archivo_maestro"
+               class="form-file-input"
+               accept=".xlsx"
+               required>
+      </div>
+
+      <div class="form-group">
+        <label for="archivo_evaluaciones" class="form-label">
+          📄 Registro de evaluaciones (.xlsx)
+        </label>
+        <input type="file"
+               id="archivo_evaluaciones"
+               name="archivo_evaluaciones"
+               class="form-file-input"
+               accept=".xlsx"
+               required>
+      </div>
+    </div>
+
+    <div class="upload-actions">
+      <button type="submit" name="accion" value="ver" class="btn btn-gold">
+        👁️ Procesar y ver en pantalla
+      </button>
+      <button type="submit" name="accion" value="excel" class="btn btn-outline">
+        ⬇️ Procesar y descargar Excel
+      </button>
+      <a href="{{ url_for('cargar.descargar_resultados') }}" class="btn btn-outline">
+        📊 Descargar resultados de fábrica
+      </a>
+    </div>
+
+    <p class="upload-help">
+      Los archivos se leen en memoria (máximo 4 MB cada uno) y nunca se escriben
+      en el disco del servidor.
+    </p>
+  </form>
+</div>
+{% endif %}
 
 <!-- ==========================================================================
      Tarjetas de Métricas Principales (3 Contadores Destacados)
@@ -59,8 +138,9 @@
   </div>
 </div>
 
+{% if session.get('rol') == 'admin' %}
 <!-- ==========================================================================
-     Cuadro / Panel de Inconsistencias
+     Cuadro / Panel de Inconsistencias (SOLO para el rol admin)
      ========================================================================== -->
 <div class="inconsistencies-panel {% if (totales.inconsistencias | default(0)) == 0 %}has-none{% endif %}">
   <div class="inconsistencies-header">
@@ -118,6 +198,7 @@
     </div>
   {% endif %}
 </div>
+{% endif %}
 
 <!-- ==========================================================================
      Tabla Detallada de Estudiantes

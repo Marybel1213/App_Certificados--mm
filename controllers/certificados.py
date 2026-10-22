@@ -10,6 +10,7 @@ import zipfile
 
 from flask import Blueprint, abort, send_file
 
+from controllers.auth import requiere_login, solo_admin
 from models.certificados import calcular_resumen, obtener_estudiante_procesado
 from services.generador_pdf import generar_certificado_pdf
 
@@ -32,6 +33,7 @@ def _nombre_archivo(estudiante: dict) -> str:
 
 
 @certificados_bp.route("/certificado/<identificacion>/<path:programa>")
+@requiere_login
 def certificado(identificacion: str, programa: str):
     """Devuelve el PDF de un estudiante certificado."""
     # LADRILLO: VARIABLE con el estudiante ya procesado (o None si no existe).
@@ -55,6 +57,7 @@ def certificado(identificacion: str, programa: str):
 
 
 @certificados_bp.route("/descargar-todos")
+@solo_admin
 def descargar_todos():
     """Devuelve un ZIP con los certificados de Aprobación y Participación."""
     resumen = calcular_resumen()

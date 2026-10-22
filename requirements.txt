@@ -7,3 +7,5 @@ python-dotenv==1.2.4
 psycopg[binary]==3.3.6
 # fpdf2 arma los certificados en PDF.
 fpdf2==2.8.9
+# pytest ejecuta las pruebas automáticas de la carpeta tests/.
+pytest==9.1.1

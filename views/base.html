@@ -26,12 +26,23 @@
               <span>📊</span> Tablero
             </a>
           </li>
+          {% if session.get('rol') == 'admin' %}
           <li>
             <a href="/cargar" class="nav-link {% if request.path == '/cargar' %}active{% endif %}">
               <span>📤</span> Cargar Excel
             </a>
           </li>
+          {% endif %}
         </ul>
+
+        {# Datos de quien entró: correo, rol y botón para salir #}
+        {% if session.get('correo') %}
+          <div class="nav-user">
+            <span class="nav-user-email">{{ session.get('correo') }}</span>
+            <span class="nav-user-role rol-{{ session.get('rol') }}">{{ session.get('rol') }}</span>
+            <a href="{{ url_for('auth.salir') }}" class="btn-salir">Salir</a>
+          </div>
+        {% endif %}
       </nav>
     </div>
   </header>

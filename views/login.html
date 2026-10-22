@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar - Academia Horizonte</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body class="login-body">
+
+  <!-- Caja centrada de entrada: mismo azul marino y dorado del resto de la app -->
+  <main class="login-wrapper">
+    <section class="login-card">
+
+      <!-- Marca institucional -->
+      <div class="login-brand">
+        <div class="login-brand-icon">🎓</div>
+        <h1 class="login-title">Academia Horizonte</h1>
+        <p class="login-subtitle">Sistema de Certificados</p>
+      </div>
+
+      <!-- Aviso de modo demostración (solo si faltan variables de entorno) -->
+      {% if modo_demo %}
+        <div class="login-alert login-alert-demo" role="status">
+          <strong>Modo demostración.</strong>
+          No se configuraron todas las variables de entorno, así que se están
+          usando los usuarios de prueba. Configure <code>ADMIN_CORREO</code>,
+          <code>ADMIN_CLAVE</code>, <code>USUARIO_CORREO</code> y
+          <code>USUARIO_CLAVE</code> en su archivo <code>.env</code>.
+        </div>
+      {% endif %}
+
+      <!-- Mensaje rojo cuando las credenciales son incorrectas -->
+      {% if error %}
+        <div class="login-alert login-alert-error" role="alert">{{ error }}</div>
+      {% endif %}
+
+      <!-- Formulario de entrada -->
+      <form method="post"
+            action="{{ url_for('auth.login', next=request.args.get('next')) }}"
+            class="login-form">
+        <div class="login-field">
+          <label for="correo" class="login-label">Correo</label>
+          <input type="email"
+                 id="correo"
+                 name="correo"
+                 class="login-input"
+                 value="{{ correo }}"
+                 autocomplete="username"
+                 placeholder="nombre@academia.cr"
+                 required
+                 autofocus>
+        </div>
+
+        <div class="login-field">
+          <label for="clave" class="login-label">Contraseña</label>
+          <input type="password"
+                 id="clave"
+                 name="clave"
+                 class="login-input"
+                 autocomplete="current-password"
+                 placeholder="Escriba su contraseña"
+                 required>
+        </div>
+
+        <button type="submit" class="btn btn-gold login-submit">Entrar</button>
+      </form>
+
+      <p class="login-foot">Acceso exclusivo para personal autorizado de la Academia.</p>
+    </section>
+  </main>
+
+</body>
+</html>
