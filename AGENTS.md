@@ -27,13 +27,16 @@
 - `models/datos.py`: ÚNICO archivo con SQL y conexión a BD. No poner SQL en otro lado.
 - `models/certificados.py`: reglas R1–R6; constantes `NOTA_MINIMA = 70`, `ASISTENCIA_MINIMA = 80`, `ASISTENCIA_INCONSISTENCIA_LIMITE = 50`.
 - `services/carga_excel.py`: lee los 2 Excel con pandas (`sheet_name` exacto) y guarda vía `models/datos.py`.
-- `controllers/`: solo rutas que orquestan (sin cálculos ni SQL). Hoy solo existe `controllers/tablero.py` con `/`.
+- `controllers/`: solo rutas que orquestan (sin cálculos ni SQL): `tablero.py` (`/`) y `certificados.py` (PDF y ZIP).
 - `views/` + `static/`: solo Jinja/HTML/CSS. Paleta `#14213D` (azul marino) y `#B8923D` (dorado).
 - Propiedad por subagente: `backend-flask` no toca `views/`; `disenador-vistas` no toca Python.
+- `services/generador_pdf.py` (fpdf2, A4 horizontal) + `controllers/certificados.py`: `/certificado/<identificacion>/<programa>` (PDF inline) y `/descargar-todos` (ZIP con 22 PDFs). Solo Aprobación y Participación; el resto responde 404.
 
 ## Estado real vs pendiente (no asumir que existe)
-- FALTAN: `services/generador_pdf.py` (fpdf2, A4 horizontal) y rutas `/cargar`, `/certificado/<identificacion>/<programa>`, `/descargar-todos` (.zip). Solo `/` funciona.
+- Funciona: `/` (tablero con filtro), `/certificado/...` y `/descargar-todos`.
+- Sigue pendiente: `/cargar` (la plantilla `views/cargar.html` existe y el menú la enlaza, pero no hay ruta: da 404).
 - Directorio real de datos es `INSUMOS/` (mayúsculas); `buscar_ruta_insumo()` acepta ambas variantes.
+- Vercel: `vercel.json` enruta todo a `app.py`; con la variable `VERCEL` la base SQLite vive en la carpeta temporal (`tempfile.gettempdir()`), no en el proyecto.
 
 ## Datos y reglas (fuente ejecutable: `models/certificados.py`, `services/carga_excel.py`)
 - `INSUMOS/Maestro_Estudiantes.xlsx` hoja `Estudiantes` / `INSUMOS/Registro_Evaluaciones.xlsx` hoja `Evaluaciones`. NUNCA modificar.

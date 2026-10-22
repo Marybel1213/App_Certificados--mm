@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 from flask import Flask
 from controllers.tablero import tablero_bp
+from controllers.certificados import certificados_bp
 from models.datos import asegurar_tablas_y_datos
 
 # LADRILLO: VARIABLE con la carpeta del proyecto según la ubicación de este
@@ -21,6 +22,7 @@ app.secret_key = os.getenv("SECRET_KEY", "academia_certificados_secret_key_2026"
 
 # Registro de Blueprints
 app.register_blueprint(tablero_bp)
+app.register_blueprint(certificados_bp)
 
 # Asegurar creación de tablas y auto-carga de datos al inicio
 try:

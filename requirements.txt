@@ -5,3 +5,5 @@ openpyxl==3.1.5
 python-dotenv==1.2.4
 # psycopg solo se usa si defines DATABASE_URL (Supabase) en Vercel; sin él, ese caso se cae.
 psycopg[binary]==3.3.6
+# fpdf2 arma los certificados en PDF.
+fpdf2==2.8.9

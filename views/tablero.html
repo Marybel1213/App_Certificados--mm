@@ -199,7 +199,7 @@
               </td>
               <td style="text-align: center;">
                 {% if 'Aprobación' in tipo or 'Participación' in tipo %}
-                  <a href="/certificado/{{ est.identificacion }}/{{ est.programa | default('General') }}" 
+                  <a href="/certificado/{{ est.identificacion }}/{{ (est.programa | default('General')) | urlencode }}" 
                      class="btn btn-outline" 
                      style="padding: 0.25rem 0.65rem; font-size: 0.8rem;" 
                      title="Ver certificado en PDF"
